@@ -12,12 +12,14 @@ import { options } from './constants';
 
 export const getAnswer = createAsyncThunk(
   'translate/getAnswer',
-  async (text) => {
-    // istek atarken göndereceğim bilgiler
+  async (param) => {
+    // aksiyon çalıştıtıldğında kaynak & hedef dili ve cümleyi alıyoruz
+    console.log(param);
+    // istek atarken göndereceğimiz bilgiler
     const encodedParams = new URLSearchParams();
-    encodedParams.set('source_language', 'tr');
-    encodedParams.set('target_language', 'en');
-    encodedParams.set('text', text);
+    encodedParams.set('source_language', param.sourceLang.value);
+    encodedParams.set('target_language', param.targetLang.value);
+    encodedParams.set('text', param.text);
 
     const options = {
       method: 'POST',
@@ -33,7 +35,8 @@ export const getAnswer = createAsyncThunk(
     // apiye istek atma kısmı
     const res = await axios.request(options);
 
-    console.log(res);
+    // verileri slice' a aktarmak için return etmek gerek
+    return res.data.data.translatedText;
   }
 );
 

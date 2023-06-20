@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getAnswer, getLanguages } from './actions';
+
 const initialState = {
   languages: [],
+  answer: '',
   isLoading: true,
   isError: false,
 };
@@ -9,7 +11,7 @@ const initialState = {
 export const translateSlice = createSlice({
   name: 'translate',
   initialState,
-  // thunkta olan "reducers" yerine "extraReducer" kullanılır
+  // thunkta olan "reducers" yerine "extraReducer" kullanılır (asnkron aksiyonlarda)
   extraReducers: {
     // atılan isteğe cevabı beklerken
     [getLanguages.pending]: (state) => {
@@ -25,7 +27,30 @@ export const translateSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     },
+    // apiye çeviri için atılan istek
+    [getAnswer.pending]: (state) => {
+      state.isLoading = true;
+    },
+
+    [getAnswer.fulfilled]: (state, action) => {
+      state.answer = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+    },
+
+    [getAnswer.rejected]: (state) => {
+      state.isError = true;
+      state.isLoading = false;
+    },
+  },
+  // senkron aksiyonlar normal reducer'da tanımlanır
+  reducers: {
+    clearAnswer: (state, action) => {
+      state.answer = '';
+    },
   },
 });
+
+export const { clearAnswer } = translateSlice.actions;
 
 export default translateSlice.reducer;
